@@ -82,32 +82,82 @@ class ExcelParserApp(QMainWindow):
         self.log.append(message)
         QApplication.processEvents()
     
-    def get_cell_value(self, sheet, merged_cell_ranges, row, col, processed_merged_cells):
-        """Получить значение ячейки с учетом объединенных ячеек, избегая дублирования."""
-        for merged_range in merged_cell_ranges:
-            if merged_range.min_row <= row <= merged_range.max_row and \
-               merged_range.min_col <= col <= merged_range.max_col:
-                
-                merged_key = (merged_range.min_row, merged_range.min_col,
-                              merged_range.max_row, merged_range.max_col)
-                
-                if merged_key not in processed_merged_cells:
-                    processed_merged_cells[merged_key] = True
-                    return sheet.cell(merged_range.min_row, merged_range.min_col).value
-                else:
-                    return None
+    def analyze_first_group_structure(self, sheet, merged_ranges, start_row, col_start, col_end):
+        """Анализирует структуру первой группы блока для определения столбцов итоговой таблицы"""
+        template_columns = []  # Будет содержать (row_offset, col) для каждого столбца
+        processed_cells = set()  # Для отслеживания уже обработанных ячеек
         
-        return sheet.cell(row, col).value
-
+        # Проходим по всем ячейкам первых 3 строк блока
+        for row_offset in range(3):  # 0, 1, 2 для строк внутри группы
+            row = start_row + row_offset
+            col = col_start
+            
+            while col <= col_end:
+                # Пропускаем уже обработанные ячейки
+                if (row, col) in processed_cells:
+                    col += 1
+                    continue
+                
+                # Проверяем, является ли ячейка частью объединения
+                is_merged = False
+                for merged_range in merged_ranges:
+                    if merged_range.min_row <= row <= merged_range.max_row and \
+                       merged_range.min_col <= col <= merged_range.max_col:
+                        # Это объединенная ячейка
+                        is_merged = True
+                        # Добавляем только верхнюю левую ячейку объединения
+                        if row == merged_range.min_row and col == merged_range.min_col:
+                            template_columns.append((row_offset, col))
+                        
+                        # Помечаем все ячейки этого объединения как обработанные
+                        for r in range(merged_range.min_row, merged_range.max_row + 1):
+                            for c in range(merged_range.min_col, merged_range.max_col + 1):
+                                processed_cells.add((r, c))
+                        
+                        # Перескакиваем на следующий столбец после объединения
+                        col = merged_range.max_col
+                        break
+                
+                if not is_merged:
+                    # Обычная ячейка - добавляем ее
+                    template_columns.append((row_offset, col))
+                    processed_cells.add((row, col))
+                
+                col += 1
+        
+        return template_columns
+    
+    def extract_data_by_template(self, sheet, merged_ranges, template_columns, group_start_row):
+        """Извлекает данные из группы по шаблону"""
+        group_data = {}
+        
+        for col_idx, (row_offset, col) in enumerate(template_columns):
+            row = group_start_row + row_offset
+            
+            # Получаем значение с учетом объединенных ячеек
+            value = None
+            for merged_range in merged_ranges:
+                if merged_range.min_row <= row <= merged_range.max_row and \
+                   merged_range.min_col <= col <= merged_range.max_col:
+                    value = sheet.cell(merged_range.min_row, merged_range.min_col).value
+                    break
+            
+            if value is None:
+                value = sheet.cell(row, col).value
+            
+            group_data[f'Value{col_idx + 1}'] = value
+        
+        return group_data
+    
     def process_sheet(self, workbook, sheet_name):
-        """Обработка отдельного листа с новой логикой для объединенных ячеек"""
+        """Обработка отдельного листа с новой логикой"""
         sheet = workbook[sheet_name]
         self.log_message(f"Processing sheet: {sheet_name}")
         
         merged_ranges = list(sheet.merged_cells.ranges)
         self.log_message(f"Found {len(merged_ranges)} merged cell ranges.")
         
-        # Поиск пустых строк для разделения блоков
+        # Находим пустые строки для разделения на цепочки
         empty_rows = []
         for row_idx in range(1, sheet.max_row + 1):
             is_empty = True
@@ -127,7 +177,7 @@ class ExcelParserApp(QMainWindow):
             if is_empty and not has_fill:
                 empty_rows.append(row_idx)
         
-        # Разделение на цепочки
+        # Разделение на цепочки (chains)
         chain_ranges = []
         start_row = 1
         
@@ -141,127 +191,80 @@ class ExcelParserApp(QMainWindow):
         
         all_data = []
         
-        for start_row, end_row in chain_ranges:
-            # Определяем количество столбцов в блоке динамически
-            col_start = 1
+        for chain_idx, (start_row, end_row) in enumerate(chain_ranges):
+            self.log_message(f"Processing chain {chain_idx+1}: rows {start_row} to {end_row}")
             
-            while col_start <= sheet.max_column:
-                processed_merged_cells = {}
+            # Разбиваем цепочку на блоки по 8 столбцов
+            for col_start in range(1, sheet.max_column, 8):
+                col_end = min(col_start + 7, sheet.max_column)
                 
-                # Ищем дату в текущем блоке
-                date_value = None
-                date_row = start_row
-                
-                while date_row <= end_row and date_value is None:
-                    cell_value = self.get_cell_value(sheet, merged_ranges, date_row, col_start, processed_merged_cells)
-                    if cell_value and str(cell_value).strip():
-                        date_value = cell_value
-                    date_row += 1
-                
-                if not date_value:
-                    col_start += 1
+                # Проверяем, что в блоке достаточно строк
+                if end_row - start_row + 1 < 6:  # Минимум 2 группы
                     continue
                 
-                # Определяем конец текущего блока
-                col_end = col_start
-                while col_end <= sheet.max_column:
-                    has_data = False
-                    for check_row in range(start_row, min(start_row + 10, end_row)):
-                        cell_value = self.get_cell_value(sheet, merged_ranges, check_row, col_end, {})
-                        if cell_value and str(cell_value).strip():
-                            has_data = True
-                            break
-                    
-                    if not has_data and col_end > col_start:
-                        col_end -= 1
-                        break
-                    
-                    col_end += 1
-                
-                if col_end >= sheet.max_column:
-                    col_end = sheet.max_column
-                
-                block_cols = col_end - col_start + 1
+                # Ищем дату в первой строке блока
+                date_value = sheet.cell(start_row, col_start).value
+                if not date_value:
+                    continue
                 
                 # Ищем значение печи
                 furnace_value = None
                 if "УВНК" in sheet_name:
                     furnace_value = sheet_name
                 else:
-                    for r in range(start_row, end_row):
+                    found_uppf = False
+                    
+                    # Ищем в первых трех строках блока
+                    for r in range(start_row, start_row + 3):
                         for c in range(col_start, col_end + 1):
-                            cell_val = self.get_cell_value(sheet, merged_ranges, r, c, {})
+                            cell_val = sheet.cell(r, c).value
                             if cell_val and "УППФ" in str(cell_val):
                                 furnace_value = cell_val
+                                found_uppf = True
                                 break
-                        if furnace_value:
+                        if found_uppf:
                             break
+                    
+                    if not found_uppf:
+                        furnace_value = ""
                 
-                if not furnace_value:
-                    furnace_value = ""
+                # Анализируем структуру первой группы блока
+                first_group_start = start_row
+                template_columns = self.analyze_first_group_structure(
+                    sheet, merged_ranges, first_group_start, col_start, col_end
+                )
                 
-                # Определяем границы данных (исключая заголовки)
-                data_start_row = start_row
-                while data_start_row <= end_row:
-                    has_numeric = False
-                    for c in range(col_start, col_end + 1):
-                        val = self.get_cell_value(sheet, merged_ranges, data_start_row, c, {})
-                        if isinstance(val, (int, float)):
-                            has_numeric = True
-                            break
-                    if has_numeric:
-                        break
-                    data_start_row += 1
-                
-                data_end_row = end_row
-                while data_end_row > data_start_row:
-                    has_data = False
-                    for c in range(col_start, col_end + 1):
-                        val = self.get_cell_value(sheet, merged_ranges, data_end_row, c, {})
-                        if val and str(val).strip():
-                            has_data = True
-                            break
-                    if has_data:
-                        break
-                    data_end_row -= 1
-                
-                if data_start_row >= data_end_row:
-                    col_start = col_end + 1
+                if not template_columns:
+                    self.log_message(f"  No template columns found for block starting at column {col_start}")
                     continue
                 
-                # Собираем данные из блока
-                for row in range(data_start_row, data_end_row + 1):
-                    row_data = {
-                        'Date': date_value,
-                        'Furnace': furnace_value,
-                        'Row': row - data_start_row + 1
-                    }
-                    
-                    row_processed_cells = {}
-                    
-                    col_values = []
-                    current_col = col_start
-                    
-                    while current_col <= col_end:
-                        value = self.get_cell_value(sheet, merged_ranges, row, current_col, row_processed_cells)
-                        
-                        if value is not None:
-                            col_values.append(value)
-                            
-                            for merged_range in merged_ranges:
-                                if merged_range.min_row <= row <= merged_range.max_row and \
-                                   merged_range.min_col <= current_col <= merged_range.max_col:
-                                    current_col = merged_range.max_col
-                                    break
-                        
-                        current_col += 1
-                    
-                    for i, value in enumerate(col_values):
-                        row_data[f'Value{i+1}'] = value
-                    
-                    all_data.append(row_data)
+                self.log_message(f"  Template has {len(template_columns)} columns")
                 
-                col_start = col_end + 1
+                # Определяем количество групп в блоке
+                total_rows_in_chain = end_row - start_row + 1
+                num_groups = total_rows_in_chain // 3
+                
+                # Обрабатываем каждую группу в блоке
+                for group_idx in range(num_groups):
+                    group_start_row = start_row + group_idx * 3
+                    
+                    # Проверяем, что группа полностью в пределах цепочки
+                    if group_start_row + 2 > end_row:
+                        continue
+                    
+                    # Извлекаем данные по шаблону
+                    group_data = self.extract_data_by_template(
+                        sheet, merged_ranges, template_columns, group_start_row
+                    )
+                    
+                    # Добавляем метаданные
+                    group_data['Date'] = date_value
+                    group_data['Furnace'] = furnace_value
+                    group_data['Group'] = group_idx + 1
+                    group_data['Block'] = chain_idx + 1
+                    group_data['Sheet'] = sheet_name
+                    
+                    all_data.append(group_data)
         
         return all_data
         
@@ -300,7 +303,7 @@ class ExcelParserApp(QMainWindow):
                     for sheet_name in workbook.sheetnames:
                         sheet_data = self.process_sheet(workbook, sheet_name)
                         all_data.extend(sheet_data)
-                        self.log_message(f"Extracted {len(sheet_data)} rows from {sheet_name}")
+                        self.log_message(f"  Extracted {len(sheet_data)} rows from {sheet_name}")
                     
                     workbook.close()
                     
@@ -309,10 +312,25 @@ class ExcelParserApp(QMainWindow):
             
             if all_data:
                 df = pd.DataFrame(all_data)
-                cols = ['Date', 'Furnace', 'Row'] + [col for col in df.columns if col not in ['Date', 'Furnace', 'Row']]
-                df = df[cols]
+                
+                # Упорядочиваем столбцы
+                base_columns = ['Date', 'Furnace', 'Group', 'Block', 'Sheet']
+                value_columns = [col for col in df.columns if col.startswith('Value')]
+                value_columns.sort(key=lambda x: int(x[5:]) if x[5:].isdigit() else 0)
+                
+                # Создаем финальный порядок столбцов
+                final_columns = base_columns + value_columns
+                df = df[final_columns]
+                
+                # Сохраняем в Excel
                 df.to_excel(output_file, index=False)
-                self.log_message(f"Data successfully saved to {output_file}. Total rows: {len(all_data)}")
+                self.log_message(f"Data successfully saved to {output_file}")
+                self.log_message(f"Total rows: {len(all_data)}")
+                self.log_message(f"Total columns: {len(final_columns)}")
+                
+                # Выводим информацию о структуре
+                self.log_message(f"Value columns: {len(value_columns)} (Value1 to Value{len(value_columns)})")
+                
             else:
                 self.log_message("No data was extracted.")
                 
