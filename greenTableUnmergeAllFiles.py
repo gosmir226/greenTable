@@ -161,6 +161,14 @@ class ExcelParserApp(QMainWindow):
         merged_ranges = list(sheet.merged_cells.ranges)
         self.log_message(f"Found {len(merged_ranges)} merged cell ranges.")
         
+        # Вспомогательная функция для получения значения с учетом объединенных ячеек
+        def get_cell_value(row, col):
+            for merged_range in merged_ranges:
+                if merged_range.min_row <= row <= merged_range.max_row and \
+                   merged_range.min_col <= col <= merged_range.max_col:
+                    return sheet.cell(merged_range.min_row, merged_range.min_col).value
+            return sheet.cell(row, col).value
+        
         # Находим пустые строки для разделения на цепочки
         empty_rows = []
         for row_idx in range(1, sheet.max_row + 1):
@@ -168,7 +176,7 @@ class ExcelParserApp(QMainWindow):
             has_fill = False
             
             for col_idx in range(1, sheet.max_column + 1):
-                cell_value = sheet.cell(row=row_idx, column=col_idx).value
+                cell_value = get_cell_value(row_idx, col_idx)
                 if cell_value is not None and str(cell_value).strip() != '':
                     is_empty = False
                     break
@@ -207,17 +215,25 @@ class ExcelParserApp(QMainWindow):
                 col_end = min(col_start + 7, sheet.max_column)
                 
                 # Проверяем, что в цепочке достаточно строк для групп
-                if chain_height < 9:  # Минимум 9 строк для групп
+                if chain_height < 6:  # Минимум 6 строк (дата + хотя бы одна группа из 3 строк)
                     self.log_message(f"  Цепочка слишком короткая ({chain_height} строк), пропускаем")
                     continue
                 
-                # Получаем дату из первой строки первого столбца блока
-                date_value = sheet.cell(start_row, col_start).value
+                # Получаем дату из первой строки первого столбца блока (КАК В СТАРОЙ ВЕРСИИ)
+                date_value = get_cell_value(start_row, col_start)
                 if not date_value:
                     self.log_message(f"  Не найдена дата в ячейке ({start_row}, {col_start}), пропускаем блок")
                     continue
                 
-                # Ищем значение печи
+                # Определяем начало и конец данных (КАК В СТАРОЙ ВЕРСИИ)
+                data_start_row = start_row + 3  # Пропускаем 3 строки сверху
+                data_end_row = end_row - 3      # Пропускаем 3 строки снизу
+                
+                if data_start_row > data_end_row:
+                    self.log_message(f"  Нет места для данных (data_start_row={data_start_row} > data_end_row={data_end_row})")
+                    continue
+                
+                # Определяем печь (КАК В СТАРОЙ ВЕРСИИ)
                 furnace_value = None
                 if has_uvnk:
                     furnace_value = sheet_name
@@ -227,7 +243,7 @@ class ExcelParserApp(QMainWindow):
                     # Ищем в первых трех строках блока
                     for r in range(start_row, start_row + 3):
                         for c in range(col_start, col_end + 1):
-                            cell_val = sheet.cell(r, c).value
+                            cell_val = get_cell_value(r, c)
                             if cell_val and "УППФ" in str(cell_val):
                                 furnace_value = cell_val
                                 found_uppf = True
@@ -236,14 +252,23 @@ class ExcelParserApp(QMainWindow):
                             break
                     
                     if not found_uppf:
+                        # Ищем в данных
+                        for r in range(data_start_row, data_end_row + 1):
+                            for c in range(col_start, col_end + 1):
+                                cell_val = get_cell_value(r, c)
+                                if cell_val and "УППФ" in str(cell_val):
+                                    furnace_value = cell_val
+                                    found_uppf = True
+                                    break
+                            if found_uppf:
+                                break
+                    
+                    if not found_uppf:
                         furnace_value = ""
-                
-                # Определяем строки для первой группы (пропускаем первые 3 строки блока)
-                first_group_start = start_row + 3
                 
                 # Анализируем структуру первой группы блока
                 template_columns = self.analyze_first_group_structure(
-                    sheet, merged_ranges, first_group_start, col_start, col_end
+                    sheet, merged_ranges, data_start_row, col_start, col_end
                 )
                 
                 if not template_columns:
@@ -252,8 +277,9 @@ class ExcelParserApp(QMainWindow):
                 
                 self.log_message(f"  Template has {len(template_columns)} columns")
                 
-                # Определяем количество групп в блоке (пропускаем первые и последние 3 строки)
-                available_rows = chain_height - 6  # Вычитаем первые и последние 3 строки
+                # Определяем количество групп (КАК В СТАРОЙ ВЕРСИИ)
+                # Каждая группа занимает 3 строки
+                available_rows = data_end_row - data_start_row + 1
                 num_groups = available_rows // 3
                 
                 if num_groups <= 0:
@@ -262,13 +288,13 @@ class ExcelParserApp(QMainWindow):
                 
                 self.log_message(f"  Found {num_groups} groups in block")
                 
-                # Обрабатываем каждую группу в блоке
+                # Обрабатываем каждую группу в блоке (КАК В СТАРОЙ ВЕРСИИ)
                 for group_idx in range(num_groups):
-                    # Вычисляем начало группы (пропускаем первые 3 строки + предыдущие группы)
-                    group_start_row = start_row + 3 + group_idx * 3
+                    group_start_row = data_start_row + group_idx * 3
+                    group_end_row = min(group_start_row + 2, data_end_row)
                     
-                    # Проверяем, что группа полностью в пределах цепочки (до последних 3 строк)
-                    if group_start_row + 2 > end_row - 3:
+                    # Проверяем, что группа полная (3 строки)
+                    if group_end_row - group_start_row < 2:
                         continue
                     
                     # Извлекаем данные по шаблону
