@@ -1,22 +1,188 @@
 import sys
 import os
 import glob
+import json
+import time
+from collections import defaultdict
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                              QHBoxLayout, QPushButton, QLabel, QFileDialog, 
-                             QLineEdit, QTextEdit, QProgressBar, QCheckBox)
-from PyQt5.QtCore import Qt
+                             QLineEdit, QTextEdit, QProgressBar, QCheckBox,
+                             QMessageBox, QTableWidget, QTableWidgetItem, 
+                             QHeaderView, QDialog, QFormLayout, QComboBox)
+from PyQt5.QtCore import Qt, QTimer
+
+class TemplateManager:
+    def __init__(self, template_file="templates.json"):
+        self.template_file = template_file
+        self.templates = []
+        self.load_templates()
+        
+    def load_templates(self):
+        """Загружает шаблоны из JSON файла"""
+        try:
+            if os.path.exists(self.template_file):
+                with open(self.template_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    self.templates = data.get('templates', [])
+                return True
+            else:
+                # Создаем пустой файл с шаблонами
+                self.save_templates()
+                return True
+        except Exception as e:
+            print(f"Error loading templates: {e}")
+            self.templates = []
+            return False
+    
+    def save_templates(self):
+        """Сохраняет шаблоны в JSON файл"""
+        try:
+            with open(self.template_file, 'w', encoding='utf-8') as f:
+                json.dump({"templates": self.templates}, f, ensure_ascii=False, indent=2)
+            return True
+        except Exception as e:
+            print(f"Error saving templates: {e}")
+            return False
+    
+    def generate_fingerprint(self, cells):
+        """Генерирует fingerprint из списка ячеек"""
+        # Сортируем ячейки по row, затем col
+        sorted_cells = sorted(cells, key=lambda x: (x['row'], x['col']))
+        
+        # Создаем части fingerprint
+        parts = []
+        for cell in sorted_cells:
+            part = f"{cell['rowspan']}x{cell['colspan']}_{cell['row']}_{cell['col']}_{str(cell['required']).lower()}"
+            parts.append(part)
+        
+        return "|".join(parts)
+    
+    def find_template(self, sheet_name, group_fingerprint):
+        """Ищет шаблон для группы"""
+        for template in self.templates:
+            # Проверяем, что подстрока sheet содержится в названии листа
+            if template['sheet'] in sheet_name and template['fingerprint'] == group_fingerprint:
+                return template
+        return None
+    
+    def create_new_template(self, sheet_name, cells, description=""):
+        """Создает новый шаблон"""
+        fingerprint = self.generate_fingerprint(cells)
+        
+        # Создаем ячейки для шаблона (без output_column)
+        template_cells = []
+        for cell in cells:
+            template_cell = {
+                'row': cell['row'],
+                'col': cell['col'],
+                'rowspan': cell['rowspan'],
+                'colspan': cell['colspan'],
+                'required': cell['required'],
+                'output_column': ''  # Пользователь заполнит позже
+            }
+            template_cells.append(template_cell)
+        
+        new_template = {
+            'id': f'template_{int(time.time())}_{len(self.templates)}',
+            'name': f'Автошаблон для {sheet_name}',
+            'sheet': sheet_name,
+            'description': description,
+            'fingerprint': fingerprint,
+            'cells': template_cells
+        }
+        
+        self.templates.append(new_template)
+        self.save_templates()
+        
+        return new_template
+    
+    def update_template(self, template_id, updates):
+        """Обновляет существующий шаблон"""
+        for template in self.templates:
+            if template['id'] == template_id:
+                template.update(updates)
+                self.save_templates()
+                return True
+        return False
+
+class TemplateEditorDialog(QDialog):
+    """Диалог для редактирования шаблона"""
+    def __init__(self, template, parent=None):
+        super().__init__(parent)
+        self.template = template
+        self.init_ui()
+        
+    def init_ui(self):
+        self.setWindowTitle(f"Редактирование шаблона: {self.template['name']}")
+        self.setGeometry(200, 200, 600, 400)
+        
+        layout = QVBoxLayout()
+        
+        # Таблица для редактирования ячеек
+        self.table = QTableWidget()
+        self.table.setColumnCount(6)
+        self.table.setHorizontalHeaderLabels(['Row', 'Col', 'RowSpan', 'ColSpan', 'Required', 'Output Column'])
+        
+        # Заполняем таблицу
+        cells = self.template['cells']
+        self.table.setRowCount(len(cells))
+        
+        for i, cell in enumerate(cells):
+            self.table.setItem(i, 0, QTableWidgetItem(str(cell['row'])))
+            self.table.setItem(i, 1, QTableWidgetItem(str(cell['col'])))
+            self.table.setItem(i, 2, QTableWidgetItem(str(cell['rowspan'])))
+            self.table.setItem(i, 3, QTableWidgetItem(str(cell['colspan'])))
+            self.table.setItem(i, 4, QTableWidgetItem(str(cell['required'])))
+            
+            # Редактируемое поле для output_column
+            item = QTableWidgetItem(cell.get('output_column', ''))
+            self.table.setItem(i, 5, item)
+        
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        layout.addWidget(self.table)
+        
+        # Кнопки
+        button_layout = QHBoxLayout()
+        self.save_btn = QPushButton("Сохранить")
+        self.cancel_btn = QPushButton("Отмена")
+        
+        self.save_btn.clicked.connect(self.accept)
+        self.cancel_btn.clicked.connect(self.reject)
+        
+        button_layout.addWidget(self.save_btn)
+        button_layout.addWidget(self.cancel_btn)
+        layout.addLayout(button_layout)
+        
+        self.setLayout(layout)
+    
+    def get_updated_cells(self):
+        """Возвращает обновленные ячейки из таблицы"""
+        cells = []
+        for i in range(self.table.rowCount()):
+            cell = {
+                'row': int(self.table.item(i, 0).text()),
+                'col': int(self.table.item(i, 1).text()),
+                'rowspan': int(self.table.item(i, 2).text()),
+                'colspan': int(self.table.item(i, 3).text()),
+                'required': self.table.item(i, 4).text().lower() == 'true',
+                'output_column': self.table.item(i, 5).text()
+            }
+            cells.append(cell)
+        return cells
 
 class ExcelParserApp(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.template_manager = TemplateManager()
+        self.unprocessed_templates = []  # Шаблоны без output_column
         self.initUI()
         
     def initUI(self):
-        self.setWindowTitle('Excel Parser for Non-Standard Tables')
-        self.setGeometry(100, 100, 800, 600)
+        self.setWindowTitle('Excel Parser with Template System')
+        self.setGeometry(100, 100, 900, 700)
         
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -43,9 +209,32 @@ class ExcelParserApp(QMainWindow):
         output_layout.addWidget(self.output_path)
         output_layout.addWidget(self.output_browse_btn)
         
+        # Template file selection
+        template_layout = QHBoxLayout()
+        self.template_label = QLabel('Template file:')
+        self.template_path = QLineEdit('templates.json')
+        self.template_browse_btn = QPushButton('Browse Template')
+        self.template_browse_btn.clicked.connect(self.browse_template_file)
+        template_layout.addWidget(self.template_label)
+        template_layout.addWidget(self.template_path)
+        template_layout.addWidget(self.template_browse_btn)
+        
+        # Buttons for template management
+        template_buttons_layout = QHBoxLayout()
+        self.edit_templates_btn = QPushButton('Edit Templates')
+        self.edit_templates_btn.clicked.connect(self.edit_templates)
+        self.reload_templates_btn = QPushButton('Reload Templates')
+        self.reload_templates_btn.clicked.connect(self.reload_templates)
+        template_buttons_layout.addWidget(self.edit_templates_btn)
+        template_buttons_layout.addWidget(self.reload_templates_btn)
+        
         # Data only option
         self.data_only_checkbox = QCheckBox("Read calculated values only (ignore formulas)")
         self.data_only_checkbox.setChecked(True)
+        
+        # Auto-create templates option
+        self.auto_create_checkbox = QCheckBox("Auto-create new templates for unknown structures")
+        self.auto_create_checkbox.setChecked(True)
         
         # Progress bar
         self.progress = QProgressBar()
@@ -61,7 +250,10 @@ class ExcelParserApp(QMainWindow):
         # Add all to main layout
         layout.addLayout(dir_layout)
         layout.addLayout(output_layout)
+        layout.addLayout(template_layout)
+        layout.addLayout(template_buttons_layout)
         layout.addWidget(self.data_only_checkbox)
+        layout.addWidget(self.auto_create_checkbox)
         layout.addWidget(self.progress)
         layout.addWidget(self.process_btn)
         layout.addWidget(self.log)
@@ -78,36 +270,115 @@ class ExcelParserApp(QMainWindow):
         if file_name:
             self.output_path.setText(file_name)
             
+    def browse_template_file(self):
+        file_name, _ = QFileDialog.getOpenFileName(self, 'Open Template File', '', 'JSON Files (*.json)')
+        if file_name:
+            self.template_path.setText(file_name)
+            self.reload_templates()
+            
+    def reload_templates(self):
+        """Перезагружает шаблоны из файла"""
+        template_file = self.template_path.text()
+        self.template_manager.template_file = template_file
+        if self.template_manager.load_templates():
+            self.log_message(f"Loaded {len(self.template_manager.templates)} templates from {template_file}")
+        else:
+            self.log_message(f"Failed to load templates from {template_file}")
+            
+    def edit_templates(self):
+        """Открывает диалог для редактирования шаблонов"""
+        if not self.template_manager.templates:
+            QMessageBox.information(self, "No Templates", "No templates available to edit.")
+            return
+            
+        # Создаем простой диалог для выбора шаблона
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Select Template to Edit")
+        dialog.setGeometry(300, 300, 400, 300)
+        
+        layout = QVBoxLayout()
+        
+        # Выпадающий список для выбора шаблона
+        form_layout = QFormLayout()
+        template_combo = QComboBox()
+        for template in self.template_manager.templates:
+            template_combo.addItem(f"{template['name']} ({template['sheet']})", template['id'])
+        form_layout.addRow("Template:", template_combo)
+        
+        layout.addLayout(form_layout)
+        
+        # Кнопки
+        button_layout = QHBoxLayout()
+        edit_btn = QPushButton("Edit")
+        cancel_btn = QPushButton("Cancel")
+        
+        def on_edit():
+            template_id = template_combo.currentData()
+            template = next((t for t in self.template_manager.templates if t['id'] == template_id), None)
+            if template:
+                editor = TemplateEditorDialog(template, self)
+                if editor.exec_() == QDialog.Accepted:
+                    updated_cells = editor.get_updated_cells()
+                    self.template_manager.update_template(template_id, {'cells': updated_cells})
+                    self.log_message(f"Template {template['name']} updated")
+            dialog.accept()
+        
+        edit_btn.clicked.connect(on_edit)
+        cancel_btn.clicked.connect(dialog.reject)
+        
+        button_layout.addWidget(edit_btn)
+        button_layout.addWidget(cancel_btn)
+        layout.addLayout(button_layout)
+        
+        dialog.setLayout(layout)
+        dialog.exec_()
+        
     def log_message(self, message):
         self.log.append(message)
         QApplication.processEvents()
     
-    def analyze_first_group_structure(self, sheet, merged_ranges, start_row, col_start, col_end):
-        """Анализирует структуру первой группы блока для определения столбцов итоговой таблицы"""
-        template_columns = []  # Будет содержать (row_offset, col) для каждого столбца
-        processed_cells = set()  # Для отслеживания уже обработанных ячеек
+    def analyze_group_structure(self, sheet, merged_ranges, group_start_row, col_start, col_end):
+        """Анализирует структуру группы и возвращает список ячеек"""
+        cells = []
+        processed_cells = set()
         
-        # Проходим по всем ячейкам первых 3 строк группы
-        for row_offset in range(3):  # 0, 1, 2 для строк внутри группы
-            row = start_row + row_offset
-            col = col_start
+        for row_offset in range(3):  # Группа всегда 3 строки
+            row_abs = group_start_row + row_offset
+            col_abs = col_start
             
-            while col <= col_end:
+            while col_abs <= col_end:
                 # Пропускаем уже обработанные ячейки
-                if (row, col) in processed_cells:
-                    col += 1
+                if (row_abs, col_abs) in processed_cells:
+                    col_abs += 1
                     continue
                 
                 # Проверяем, является ли ячейка частью объединения
                 is_merged = False
+                rowspan = 1
+                colspan = 1
+                
                 for merged_range in merged_ranges:
-                    if merged_range.min_row <= row <= merged_range.max_row and \
-                       merged_range.min_col <= col <= merged_range.max_col:
+                    if merged_range.min_row <= row_abs <= merged_range.max_row and \
+                       merged_range.min_col <= col_abs <= merged_range.max_col:
                         # Это объединенная ячейка
                         is_merged = True
-                        # Добавляем только верхнюю левую ячейку объединения
-                        if row == merged_range.min_row and col == merged_range.min_col:
-                            template_columns.append((row_offset, col))
+                        rowspan = merged_range.max_row - merged_range.min_row + 1
+                        colspan = merged_range.max_col - merged_range.min_col + 1
+                        
+                        # Проверяем, является ли эта ячейка верхней левой в объединении
+                        if row_abs == merged_range.min_row and col_abs == merged_range.min_col:
+                            # Это начало объединения - добавляем ячейку
+                            cell_value = sheet.cell(merged_range.min_row, merged_range.min_col).value
+                            has_data = cell_value is not None and str(cell_value).strip() != ''
+                            
+                            cells.append({
+                                'row': row_offset,
+                                'col': col_abs - col_start,
+                                'rowspan': rowspan,
+                                'colspan': colspan,
+                                'required': has_data,
+                                'value': cell_value
+                            })
                         
                         # Помечаем все ячейки этого объединения как обработанные
                         for r in range(merged_range.min_row, merged_range.max_row + 1):
@@ -115,42 +386,50 @@ class ExcelParserApp(QMainWindow):
                                 processed_cells.add((r, c))
                         
                         # Перескакиваем на следующий столбец после объединения
-                        col = merged_range.max_col
+                        col_abs = merged_range.max_col
                         break
                 
                 if not is_merged:
-                    # Обычная ячейка - добавляем ее
-                    template_columns.append((row_offset, col))
-                    processed_cells.add((row, col))
+                    # Обычная ячейка
+                    cell_value = sheet.cell(row_abs, col_abs).value
+                    has_data = cell_value is not None and str(cell_value).strip() != ''
+                    
+                    cells.append({
+                        'row': row_offset,
+                        'col': col_abs - col_start,
+                        'rowspan': 1,
+                        'colspan': 1,
+                        'required': has_data,
+                        'value': cell_value
+                    })
+                    
+                    processed_cells.add((row_abs, col_abs))
                 
-                col += 1
+                col_abs += 1
         
-        return template_columns
+        return cells
     
-    def extract_data_by_template(self, sheet, merged_ranges, template_columns, group_start_row):
-        """Извлекает данные из группы по шаблону"""
-        group_data = {}
+    def extract_data_with_template(self, group_cells, template):
+        """Извлекает данные из группы с использованием шаблона"""
+        data = {}
         
-        for col_idx, (row_offset, col) in enumerate(template_columns):
-            row = group_start_row + row_offset
-            
-            # Получаем значение с учетом объединенных ячеек
-            value = None
-            for merged_range in merged_ranges:
-                if merged_range.min_row <= row <= merged_range.max_row and \
-                   merged_range.min_col <= col <= merged_range.max_col:
-                    value = sheet.cell(merged_range.min_row, merged_range.min_col).value
-                    break
-            
-            if value is None:
-                value = sheet.cell(row, col).value
-            
-            group_data[f'Value{col_idx + 1}'] = value
+        # Извлекаем данные по шаблону
+        for cell_def in template['cells']:
+            output_column = cell_def.get('output_column', '')
+            if output_column:  # Только если output_column задан
+                # Находим соответствующую ячейку в группе
+                for cell in group_cells:
+                    if (cell['row'] == cell_def['row'] and 
+                        cell['col'] == cell_def['col'] and
+                        cell['rowspan'] == cell_def['rowspan'] and
+                        cell['colspan'] == cell_def['colspan']):
+                        data[output_column] = cell['value']
+                        break
         
-        return group_data
+        return data
     
     def process_sheet(self, workbook, sheet_name):
-        """Обработка отдельного листа с новой логикой"""
+        """Обработка отдельного листа с новой логикой шаблонов"""
         sheet = workbook[sheet_name]
         self.log_message(f"Processing sheet: {sheet_name}")
         
@@ -202,6 +481,7 @@ class ExcelParserApp(QMainWindow):
             chain_ranges.append((start_row, sheet.max_row))
         
         all_data = []
+        new_templates_created = []
         
         for chain_idx, (start_row, end_row) in enumerate(chain_ranges):
             chain_height = end_row - start_row + 1
@@ -219,13 +499,13 @@ class ExcelParserApp(QMainWindow):
                     self.log_message(f"  Цепочка слишком короткая ({chain_height} строк), пропускаем")
                     continue
                 
-                # Получаем дату из первой строки первого столбца блока (КАК В СТАРОЙ ВЕРСИИ)
+                # Получаем дату из первой строки первого столбца блока
                 date_value = get_cell_value(start_row, col_start)
                 if not date_value:
                     self.log_message(f"  Не найдена дата в ячейке ({start_row}, {col_start}), пропускаем блок")
                     continue
                 
-                # Определяем начало и конец данных (КАК В СТАРОЙ ВЕРСИИ)
+                # Определяем начало и конец данных
                 data_start_row = start_row + 3  # Пропускаем 3 строки сверху
                 data_end_row = end_row - 3      # Пропускаем 3 строки снизу
                 
@@ -233,7 +513,7 @@ class ExcelParserApp(QMainWindow):
                     self.log_message(f"  Нет места для данных (data_start_row={data_start_row} > data_end_row={data_end_row})")
                     continue
                 
-                # Определяем печь (КАК В СТАРОЙ ВЕРСИИ)
+                # Определяем печь
                 furnace_value = None
                 if has_uvnk:
                     furnace_value = sheet_name
@@ -252,33 +532,9 @@ class ExcelParserApp(QMainWindow):
                             break
                     
                     if not found_uppf:
-                        # Ищем в данных
-                        for r in range(data_start_row, data_end_row + 1):
-                            for c in range(col_start, col_end + 1):
-                                cell_val = get_cell_value(r, c)
-                                if cell_val and "УППФ" in str(cell_val):
-                                    furnace_value = cell_val
-                                    found_uppf = True
-                                    break
-                            if found_uppf:
-                                break
-                    
-                    if not found_uppf:
                         furnace_value = ""
                 
-                # Анализируем структуру первой группы блока
-                template_columns = self.analyze_first_group_structure(
-                    sheet, merged_ranges, data_start_row, col_start, col_end
-                )
-                
-                if not template_columns:
-                    self.log_message(f"  No template columns found for block starting at column {col_start}")
-                    continue
-                
-                self.log_message(f"  Template has {len(template_columns)} columns")
-                
-                # Определяем количество групп (КАК В СТАРОЙ ВЕРСИИ)
-                # Каждая группа занимает 3 строки
+                # Определяем количество групп
                 available_rows = data_end_row - data_start_row + 1
                 num_groups = available_rows // 3
                 
@@ -288,7 +544,7 @@ class ExcelParserApp(QMainWindow):
                 
                 self.log_message(f"  Found {num_groups} groups in block")
                 
-                # Обрабатываем каждую группу в блоке (КАК В СТАРОЙ ВЕРСИИ)
+                # Обрабатываем каждую группу в блоке
                 for group_idx in range(num_groups):
                     group_start_row = data_start_row + group_idx * 3
                     group_end_row = min(group_start_row + 2, data_end_row)
@@ -297,22 +553,92 @@ class ExcelParserApp(QMainWindow):
                     if group_end_row - group_start_row < 2:
                         continue
                     
-                    # Извлекаем данные по шаблону
-                    group_data = self.extract_data_by_template(
-                        sheet, merged_ranges, template_columns, group_start_row
+                    # Анализируем структуру группы
+                    group_cells = self.analyze_group_structure(
+                        sheet, merged_ranges, group_start_row, col_start, col_end
                     )
                     
-                    # Добавляем метаданные
-                    group_data['Date'] = date_value
-                    group_data['Furnace'] = furnace_value
-                    group_data['Group'] = group_idx + 1  # Нумерация групп внутри блока
-                    group_data['Block'] = chain_idx + 1
-                    group_data['Sheet'] = sheet_name
+                    # Создаем cells для fingerprint (без значений)
+                    cells_for_fingerprint = []
+                    for cell in group_cells:
+                        cells_for_fingerprint.append({
+                            'row': cell['row'],
+                            'col': cell['col'],
+                            'rowspan': cell['rowspan'],
+                            'colspan': cell['colspan'],
+                            'required': cell['required']
+                        })
                     
-                    all_data.append(group_data)
+                    # Генерируем fingerprint
+                    group_fingerprint = self.template_manager.generate_fingerprint(cells_for_fingerprint)
+                    
+                    # Ищем подходящий шаблон
+                    template = self.template_manager.find_template(sheet_name, group_fingerprint)
+                    
+                    if template:
+                        # Используем существующий шаблон
+                        group_data = self.extract_data_with_template(group_cells, template)
+                        
+                        # Добавляем метаданные
+                        group_data['Date'] = date_value
+                        group_data['Furnace'] = furnace_value
+                        group_data['Group'] = group_idx + 1
+                        group_data['Block'] = chain_idx + 1
+                        group_data['Sheet'] = sheet_name
+                        group_data['Template'] = template['id']
+                        
+                        all_data.append(group_data)
+                        
+                        self.log_message(f"    Group {group_idx+1}: used template '{template['name']}'")
+                    
+                    elif self.auto_create_checkbox.isChecked():
+                        # Создаем новый шаблон
+                        new_template = self.template_manager.create_new_template(
+                            sheet_name, 
+                            cells_for_fingerprint,
+                            f"Auto-created from sheet {sheet_name}, chain {chain_idx+1}, block starting col {col_start}"
+                        )
+                        
+                        new_templates_created.append(new_template['id'])
+                        
+                        self.log_message(f"    Group {group_idx+1}: created new template '{new_template['name']}'")
+                        
+                        # Если в шаблоне уже есть output_column, можно сразу использовать
+                        has_output_columns = any(cell.get('output_column') for cell in new_template['cells'])
+                        if has_output_columns:
+                            group_data = self.extract_data_with_template(group_cells, new_template)
+                            group_data['Date'] = date_value
+                            group_data['Furnace'] = furnace_value
+                            group_data['Group'] = group_idx + 1
+                            group_data['Block'] = chain_idx + 1
+                            group_data['Sheet'] = sheet_name
+                            group_data['Template'] = new_template['id']
+                            all_data.append(group_data)
+                    
+                    else:
+                        self.log_message(f"    Group {group_idx+1}: no template found and auto-create disabled")
+        
+        if new_templates_created:
+            self.log_message(f"Created {len(new_templates_created)} new templates")
+            # Предлагаем пользователю отредактировать новые шаблоны
+            QTimer.singleShot(100, self.prompt_template_edit)
         
         return all_data
-        
+    
+    def prompt_template_edit(self):
+        """Предлагает пользователю отредактировать новые шаблоны"""
+        if self.template_manager.templates:
+            reply = QMessageBox.question(
+                self, 
+                "New Templates Created", 
+                f"Created {len(self.template_manager.templates)} templates. Would you like to edit them now?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.Yes
+            )
+            
+            if reply == QMessageBox.Yes:
+                self.edit_templates()
+    
     def process_directory(self):
         try:
             directory = self.dir_path.text()
@@ -321,6 +647,9 @@ class ExcelParserApp(QMainWindow):
             if not directory:
                 self.log_message("Please select a directory first.")
                 return
+            
+            # Перезагружаем шаблоны
+            self.reload_templates()
                 
             self.log_message("Scanning directory for Excel files...")
             excel_files = glob.glob(os.path.join(directory, "**", "*.xlsx"), recursive=True)
@@ -356,15 +685,25 @@ class ExcelParserApp(QMainWindow):
                     self.log_message(f"Error processing file {input_file}: {str(e)}")
             
             if all_data:
+                # Собираем все уникальные столбцы
+                all_columns = set()
+                for row in all_data:
+                    all_columns.update(row.keys())
+                
+                # Сортируем столбцы: сначала метаданные, затем остальные
+                base_columns = ['Date', 'Furnace', 'Group', 'Block', 'Sheet', 'Template']
+                other_columns = sorted([col for col in all_columns if col not in base_columns])
+                final_columns = base_columns + other_columns
+                
+                # Создаем DataFrame
                 df = pd.DataFrame(all_data)
                 
-                # Упорядочиваем столбцы
-                base_columns = ['Date', 'Furnace', 'Group', 'Block', 'Sheet']
-                value_columns = [col for col in df.columns if col.startswith('Value')]
-                value_columns.sort(key=lambda x: int(x[5:]) if x[5:].isdigit() else 0)
+                # Убеждаемся, что все столбцы существуют
+                for col in final_columns:
+                    if col not in df.columns:
+                        df[col] = None
                 
-                # Создаем финальный порядок столбцов
-                final_columns = base_columns + value_columns
+                # Упорядочиваем столбцы
                 df = df[final_columns]
                 
                 # Сохраняем в Excel
@@ -372,9 +711,7 @@ class ExcelParserApp(QMainWindow):
                 self.log_message(f"Data successfully saved to {output_file}")
                 self.log_message(f"Total rows: {len(all_data)}")
                 self.log_message(f"Total columns: {len(final_columns)}")
-                
-                # Выводим информацию о структуре
-                self.log_message(f"Value columns: {len(value_columns)} (Value1 to Value{len(value_columns)})")
+                self.log_message(f"Total templates in library: {len(self.template_manager.templates)}")
                 
             else:
                 self.log_message("No data was extracted.")
@@ -383,6 +720,8 @@ class ExcelParserApp(QMainWindow):
             
         except Exception as e:
             self.log_message(f"Error: {str(e)}")
+            import traceback
+            self.log_message(traceback.format_exc())
             self.progress.setValue(0)
 
 def main():
