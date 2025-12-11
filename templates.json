@@ -1,9 +1,10 @@
 {
   "templates": [
     {
-      "id": "template_1765455002_0",
+      "id": "template_1765459228_0",
       "name": "Автошаблон для 498(УВНК-9А№2)",
       "sheet": "498(УВНК-9А№2)",
+      "has_uvnk": true,
       "description": "Auto-created from sheet 498(УВНК-9А№2), chain 1, block starting col 1",
       "fingerprint": "3x1_0_0_true|3x1_0_1_true|1x3_0_2_true|1x3_0_5_true|1x3_1_2_true|2x3_1_5_true|1x3_2_2_true",
       "cells": [
@@ -13,7 +14,12 @@
           "rowspan": 3,
           "colspan": 1,
           "required": true,
-          "output_column": "Плавка"
+          "example": 30,
+          "absolute_position": {
+            "row": 4,
+            "col": 1
+          },
+          "output_column": "Керамика"
         },
         {
           "row": 0,
@@ -21,7 +27,12 @@
           "rowspan": 3,
           "colspan": 1,
           "required": true,
-          "output_column": ""
+          "example": 30,
+          "absolute_position": {
+            "row": 4,
+            "col": 2
+          },
+          "output_column": "Железо"
         },
         {
           "row": 0,
@@ -29,7 +40,12 @@
           "rowspan": 1,
           "colspan": 3,
           "required": true,
-          "output_column": ""
+          "example": "25-Н-4003",
+          "absolute_position": {
+            "row": 4,
+            "col": 3
+          },
+          "output_column": "Шихта"
         },
         {
           "row": 0,
@@ -37,7 +53,12 @@
           "rowspan": 1,
           "colspan": 3,
           "required": true,
-          "output_column": ""
+          "example": 1184,
+          "absolute_position": {
+            "row": 4,
+            "col": 6
+          },
+          "output_column": "Блок 1"
         },
         {
           "row": 1,
@@ -45,7 +66,12 @@
           "rowspan": 1,
           "colspan": 3,
           "required": true,
-          "output_column": ""
+          "example": "25Н143(1)",
+          "absolute_position": {
+            "row": 5,
+            "col": 3
+          },
+          "output_column": "Плавка"
         },
         {
           "row": 1,
@@ -53,7 +79,12 @@
           "rowspan": 2,
           "colspan": 3,
           "required": true,
-          "output_column": ""
+          "example": "9 шт.обр.",
+          "absolute_position": {
+            "row": 5,
+            "col": 6
+          },
+          "output_column": "Комментарий"
         },
         {
           "row": 2,
@@ -61,14 +92,20 @@
           "rowspan": 1,
           "colspan": 3,
           "required": true,
-          "output_column": ""
+          "example": 1266,
+          "absolute_position": {
+            "row": 6,
+            "col": 3
+          },
+          "output_column": "Блок 2"
         }
       ]
     },
     {
-      "id": "template_1765455002_1",
+      "id": "template_1765459228_1",
       "name": "Автошаблон для 498(УВНК-9А№2)",
       "sheet": "498(УВНК-9А№2)",
+      "has_uvnk": true,
       "description": "Auto-created from sheet 498(УВНК-9А№2), chain 1, block starting col 1",
       "fingerprint": "3x1_0_0_false|3x1_0_1_false|1x3_0_2_false|1x3_0_5_false|1x3_1_2_false|2x3_1_5_false|1x3_2_2_false",
       "cells": [
@@ -78,6 +115,11 @@
           "rowspan": 3,
           "colspan": 1,
           "required": false,
+          "example": null,
+          "absolute_position": {
+            "row": 19,
+            "col": 1
+          },
           "output_column": ""
         },
         {
@@ -86,6 +128,11 @@
           "rowspan": 3,
           "colspan": 1,
           "required": false,
+          "example": null,
+          "absolute_position": {
+            "row": 19,
+            "col": 2
+          },
           "output_column": ""
         },
         {
@@ -94,6 +141,11 @@
           "rowspan": 1,
           "colspan": 3,
           "required": false,
+          "example": null,
+          "absolute_position": {
+            "row": 19,
+            "col": 3
+          },
           "output_column": ""
         },
         {
@@ -102,6 +154,11 @@
           "rowspan": 1,
           "colspan": 3,
           "required": false,
+          "example": null,
+          "absolute_position": {
+            "row": 19,
+            "col": 6
+          },
           "output_column": ""
         },
         {
@@ -110,6 +167,11 @@
           "rowspan": 1,
           "colspan": 3,
           "required": false,
+          "example": null,
+          "absolute_position": {
+            "row": 20,
+            "col": 3
+          },
           "output_column": ""
         },
         {
@@ -118,6 +180,11 @@
           "rowspan": 2,
           "colspan": 3,
           "required": false,
+          "example": null,
+          "absolute_position": {
+            "row": 20,
+            "col": 6
+          },
           "output_column": ""
         },
         {
@@ -126,34 +193,14 @@
           "rowspan": 1,
           "colspan": 3,
           "required": false,
+          "example": null,
+          "absolute_position": {
+            "row": 21,
+            "col": 3
+          },
           "output_column": ""
         }
       ]
-    },
-    {
-      "id": "template_1765455002_2",
-      "name": "Автошаблон для 498(УВНК-9А№2)",
-      "sheet": "498(УВНК-9А№2)",
-      "description": "Auto-created from sheet 498(УВНК-9А№2), chain 1, block starting col 25",
-      "fingerprint": "15x8_0_0_true",
-      "cells": [
-        {
-          "row": 0,
-          "col": 0,
-          "rowspan": 15,
-          "colspan": 8,
-          "required": true,
-          "output_column": ""
-        }
-      ]
-    },
-    {
-      "id": "template_1765455002_3",
-      "name": "Автошаблон для 498(УВНК-9А№2)",
-      "sheet": "498(УВНК-9А№2)",
-      "description": "Auto-created from sheet 498(УВНК-9А№2), chain 1, block starting col 25",
-      "fingerprint": "",
-      "cells": []
     }
   ]
 }

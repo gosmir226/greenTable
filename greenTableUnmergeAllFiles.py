@@ -60,28 +60,36 @@ class TemplateManager:
         
         return "|".join(parts)
     
-    def find_template(self, sheet_name, group_fingerprint):
+    def find_template(self, sheet_name, group_fingerprint, has_uvnk):
         """Ищет шаблон для группы"""
         for template in self.templates:
             # Проверяем, что подстрока sheet содержится в названии листа
-            if template['sheet'] in sheet_name and template['fingerprint'] == group_fingerprint:
+            # И что режим увнк совпадает
+            if (template['sheet'] in sheet_name and 
+                template['fingerprint'] == group_fingerprint and
+                template.get('has_uvnk', False) == has_uvnk):
                 return template
         return None
     
-    def create_new_template(self, sheet_name, cells, description=""):
+    def create_new_template(self, sheet_name, cells, has_uvnk, description="", example_cells=None):
         """Создает новый шаблон"""
         fingerprint = self.generate_fingerprint(cells)
         
-        # Создаем ячейки для шаблона (без output_column)
+        # Создаем ячейки для шаблона
         template_cells = []
-        for cell in cells:
+        for i, cell in enumerate(cells):
             template_cell = {
                 'row': cell['row'],
                 'col': cell['col'],
                 'rowspan': cell['rowspan'],
                 'colspan': cell['colspan'],
                 'required': cell['required'],
-                'output_column': ''  # Пользователь заполнит позже
+                'output_column': '',  # Пользователь заполнит позже
+                'example': example_cells[i]['value'] if example_cells and i < len(example_cells) else '',
+                'absolute_position': {
+                    'row': example_cells[i]['absolute_row'] if example_cells and i < len(example_cells) else 0,
+                    'col': example_cells[i]['absolute_col'] if example_cells and i < len(example_cells) else 0
+                }
             }
             template_cells.append(template_cell)
         
@@ -89,6 +97,7 @@ class TemplateManager:
             'id': f'template_{int(time.time())}_{len(self.templates)}',
             'name': f'Автошаблон для {sheet_name}',
             'sheet': sheet_name,
+            'has_uvnk': has_uvnk,
             'description': description,
             'fingerprint': fingerprint,
             'cells': template_cells
@@ -117,31 +126,65 @@ class TemplateEditorDialog(QDialog):
         
     def init_ui(self):
         self.setWindowTitle(f"Редактирование шаблона: {self.template['name']}")
-        self.setGeometry(200, 200, 600, 400)
+        self.setGeometry(200, 200, 800, 500)
         
         layout = QVBoxLayout()
         
+        # Информация о шаблоне
+        info_label = QLabel(
+            f"Лист: {self.template['sheet']} | "
+            f"УВНК: {'Да' if self.template.get('has_uvnk', False) else 'Нет'}\n"
+            f"Описание: {self.template.get('description', '')}"
+        )
+        layout.addWidget(info_label)
+        
         # Таблица для редактирования ячеек
         self.table = QTableWidget()
-        self.table.setColumnCount(6)
-        self.table.setHorizontalHeaderLabels(['Row', 'Col', 'RowSpan', 'ColSpan', 'Required', 'Output Column'])
+        self.table.setColumnCount(9)
+        self.table.setHorizontalHeaderLabels([
+            'Row', 'Col', 'RowSpan', 'ColSpan', 'Required', 
+            'Пример', 'Абс. позиция', 'Output Column', 'Примечание'
+        ])
         
         # Заполняем таблицу
         cells = self.template['cells']
         self.table.setRowCount(len(cells))
         
         for i, cell in enumerate(cells):
+            # Основные параметры (только для чтения)
             self.table.setItem(i, 0, QTableWidgetItem(str(cell['row'])))
             self.table.setItem(i, 1, QTableWidgetItem(str(cell['col'])))
             self.table.setItem(i, 2, QTableWidgetItem(str(cell['rowspan'])))
             self.table.setItem(i, 3, QTableWidgetItem(str(cell['colspan'])))
             self.table.setItem(i, 4, QTableWidgetItem(str(cell['required'])))
             
+            # Пример значения
+            example = cell.get('example', '')
+            if example and len(str(example)) > 20:
+                example = str(example)[:20] + "..."
+            self.table.setItem(i, 5, QTableWidgetItem(str(example)))
+            
+            # Абсолютная позиция
+            abs_pos = cell.get('absolute_position', {})
+            pos_str = f"R{abs_pos.get('row', 0)}C{abs_pos.get('col', 0)}"
+            self.table.setItem(i, 6, QTableWidgetItem(pos_str))
+            
             # Редактируемое поле для output_column
             item = QTableWidgetItem(cell.get('output_column', ''))
-            self.table.setItem(i, 5, item)
+            self.table.setItem(i, 7, item)
+            
+            # Примечание (автоматически генерируется)
+            note = ""
+            if cell['rowspan'] >= 3 and cell['colspan'] >= 8:
+                note = "ГИГАНТСКАЯ ЯЧЕЙКА - пропуск группы"
+            elif cell['rowspan'] > 1 or cell['colspan'] > 1:
+                note = f"Объединение: {cell['rowspan']}×{cell['colspan']}"
+            self.table.setItem(i, 8, QTableWidgetItem(note))
         
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # Настраиваем ширину столбцов
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(7, QHeaderView.Stretch)  # Output Column шире
+        
         layout.addWidget(self.table)
         
         # Кнопки
@@ -162,13 +205,16 @@ class TemplateEditorDialog(QDialog):
         """Возвращает обновленные ячейки из таблицы"""
         cells = []
         for i in range(self.table.rowCount()):
+            original_cell = self.template['cells'][i]
             cell = {
                 'row': int(self.table.item(i, 0).text()),
                 'col': int(self.table.item(i, 1).text()),
                 'rowspan': int(self.table.item(i, 2).text()),
                 'colspan': int(self.table.item(i, 3).text()),
                 'required': self.table.item(i, 4).text().lower() == 'true',
-                'output_column': self.table.item(i, 5).text()
+                'example': original_cell.get('example', ''),
+                'absolute_position': original_cell.get('absolute_position', {}),
+                'output_column': self.table.item(i, 7).text()
             }
             cells.append(cell)
         return cells
@@ -228,10 +274,6 @@ class ExcelParserApp(QMainWindow):
         template_buttons_layout.addWidget(self.edit_templates_btn)
         template_buttons_layout.addWidget(self.reload_templates_btn)
         
-        # Data only option
-        self.data_only_checkbox = QCheckBox("Read calculated values only (ignore formulas)")
-        self.data_only_checkbox.setChecked(True)
-        
         # Auto-create templates option
         self.auto_create_checkbox = QCheckBox("Auto-create new templates for unknown structures")
         self.auto_create_checkbox.setChecked(True)
@@ -252,7 +294,6 @@ class ExcelParserApp(QMainWindow):
         layout.addLayout(output_layout)
         layout.addLayout(template_layout)
         layout.addLayout(template_buttons_layout)
-        layout.addWidget(self.data_only_checkbox)
         layout.addWidget(self.auto_create_checkbox)
         layout.addWidget(self.progress)
         layout.addWidget(self.process_btn)
@@ -302,7 +343,8 @@ class ExcelParserApp(QMainWindow):
         form_layout = QFormLayout()
         template_combo = QComboBox()
         for template in self.template_manager.templates:
-            template_combo.addItem(f"{template['name']} ({template['sheet']})", template['id'])
+            uvkn_text = " (УВНК)" if template.get('has_uvnk', False) else ""
+            template_combo.addItem(f"{template['name']}{uvkn_text}", template['id'])
         form_layout.addRow("Template:", template_combo)
         
         layout.addLayout(form_layout)
@@ -340,7 +382,18 @@ class ExcelParserApp(QMainWindow):
     def analyze_group_structure(self, sheet, merged_ranges, group_start_row, col_start, col_end):
         """Анализирует структуру группы и возвращает список ячеек"""
         cells = []
+        example_cells = []  # Сохраняем примеры значений и координаты
         processed_cells = set()
+        
+        # Проверяем, есть ли гигантская ячейка, покрывающая всю группу
+        for merged_range in merged_ranges:
+            if (merged_range.min_row <= group_start_row and 
+                merged_range.max_row >= group_start_row + 2 and
+                merged_range.min_col <= col_start and 
+                merged_range.max_col >= col_end):
+                # Гигантская ячейка покрывает всю группу
+                self.log_message(f"    WARNING: Giant cell covering entire group found at R{merged_range.min_row}C{merged_range.min_col}")
+                return [], []  # Возвращаем пустые списки - группу пропускаем
         
         for row_offset in range(3):  # Группа всегда 3 строки
             row_abs = group_start_row + row_offset
@@ -356,6 +409,8 @@ class ExcelParserApp(QMainWindow):
                 is_merged = False
                 rowspan = 1
                 colspan = 1
+                start_row_abs = row_abs
+                start_col_abs = col_abs
                 
                 for merged_range in merged_ranges:
                     if merged_range.min_row <= row_abs <= merged_range.max_row and \
@@ -364,6 +419,8 @@ class ExcelParserApp(QMainWindow):
                         is_merged = True
                         rowspan = merged_range.max_row - merged_range.min_row + 1
                         colspan = merged_range.max_col - merged_range.min_col + 1
+                        start_row_abs = merged_range.min_row
+                        start_col_abs = merged_range.min_col
                         
                         # Проверяем, является ли эта ячейка верхней левой в объединении
                         if row_abs == merged_range.min_row and col_abs == merged_range.min_col:
@@ -376,8 +433,14 @@ class ExcelParserApp(QMainWindow):
                                 'col': col_abs - col_start,
                                 'rowspan': rowspan,
                                 'colspan': colspan,
-                                'required': has_data,
-                                'value': cell_value
+                                'required': has_data
+                            })
+                            
+                            # Сохраняем пример значения и координаты
+                            example_cells.append({
+                                'value': cell_value,
+                                'absolute_row': merged_range.min_row,
+                                'absolute_col': merged_range.min_col
                             })
                         
                         # Помечаем все ячейки этого объединения как обработанные
@@ -399,15 +462,21 @@ class ExcelParserApp(QMainWindow):
                         'col': col_abs - col_start,
                         'rowspan': 1,
                         'colspan': 1,
-                        'required': has_data,
-                        'value': cell_value
+                        'required': has_data
+                    })
+                    
+                    # Сохраняем пример значения и координаты
+                    example_cells.append({
+                        'value': cell_value,
+                        'absolute_row': row_abs,
+                        'absolute_col': col_abs
                     })
                     
                     processed_cells.add((row_abs, col_abs))
                 
                 col_abs += 1
         
-        return cells
+        return cells, example_cells
     
     def extract_data_with_template(self, group_cells, template):
         """Извлекает данные из группы с использованием шаблона"""
@@ -495,7 +564,7 @@ class ExcelParserApp(QMainWindow):
                 col_end = min(col_start + 7, sheet.max_column)
                 
                 # Проверяем, что в цепочке достаточно строк для групп
-                if chain_height < 6:  # Минимум 6 строк (дата + хотя бы одна группа из 3 строк)
+                if chain_height < 9:  # Минимум 9 строк (3 сверху + 3 группа + 3 снизу)
                     self.log_message(f"  Цепочка слишком короткая ({chain_height} строк), пропускаем")
                     continue
                 
@@ -505,7 +574,7 @@ class ExcelParserApp(QMainWindow):
                     self.log_message(f"  Не найдена дата в ячейке ({start_row}, {col_start}), пропускаем блок")
                     continue
                 
-                # Определяем начало и конец данных
+                # Определяем начало и конец данных (пропускаем 3 строки сверху и 3 снизу)
                 data_start_row = start_row + 3  # Пропускаем 3 строки сверху
                 data_end_row = end_row - 3      # Пропускаем 3 строки снизу
                 
@@ -554,9 +623,14 @@ class ExcelParserApp(QMainWindow):
                         continue
                     
                     # Анализируем структуру группы
-                    group_cells = self.analyze_group_structure(
+                    group_cells, example_cells = self.analyze_group_structure(
                         sheet, merged_ranges, group_start_row, col_start, col_end
                     )
+                    
+                    # Если группа пустая (гигантская ячейка пропущена)
+                    if not group_cells:
+                        self.log_message(f"    Group {group_idx+1}: skipped (giant cell)")
+                        continue
                     
                     # Создаем cells для fingerprint (без значений)
                     cells_for_fingerprint = []
@@ -573,7 +647,7 @@ class ExcelParserApp(QMainWindow):
                     group_fingerprint = self.template_manager.generate_fingerprint(cells_for_fingerprint)
                     
                     # Ищем подходящий шаблон
-                    template = self.template_manager.find_template(sheet_name, group_fingerprint)
+                    template = self.template_manager.find_template(sheet_name, group_fingerprint, has_uvnk)
                     
                     if template:
                         # Используем существующий шаблон
@@ -596,7 +670,9 @@ class ExcelParserApp(QMainWindow):
                         new_template = self.template_manager.create_new_template(
                             sheet_name, 
                             cells_for_fingerprint,
-                            f"Auto-created from sheet {sheet_name}, chain {chain_idx+1}, block starting col {col_start}"
+                            has_uvnk,
+                            f"Auto-created from sheet {sheet_name}, chain {chain_idx+1}, block starting col {col_start}",
+                            example_cells
                         )
                         
                         new_templates_created.append(new_template['id'])
@@ -669,10 +745,8 @@ class ExcelParserApp(QMainWindow):
                 self.log_message(f"Processing file {file_idx+1}/{total_files}: {os.path.basename(input_file)}")
                 
                 try:
-                    if self.data_only_checkbox.isChecked():
-                        workbook = load_workbook(filename=input_file, data_only=True)
-                    else:
-                        workbook = load_workbook(filename=input_file)
+                    # ВСЕГДА используем data_only=True (игнорируем формулы)
+                    workbook = load_workbook(filename=input_file, data_only=True)
                     
                     for sheet_name in workbook.sheetnames:
                         sheet_data = self.process_sheet(workbook, sheet_name)
