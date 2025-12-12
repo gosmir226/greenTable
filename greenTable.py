@@ -6,22 +6,21 @@ import time
 from collections import defaultdict
 import pandas as pd
 from openpyxl import load_workbook
-from openpyxl.styles import PatternFill
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                              QHBoxLayout, QPushButton, QLabel, QFileDialog, 
                              QLineEdit, QTextEdit, QProgressBar, QCheckBox,
                              QMessageBox, QTableWidget, QTableWidgetItem, 
                              QHeaderView, QDialog, QFormLayout, QComboBox)
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, QSettings
 
 class TemplateManager:
-    def __init__(self, template_file="templates.json"):
-        self.template_file = template_file
+    def __init__(self):
+        self.template_file = "templates.json"  # Всегда в папке программы
         self.templates = []
         self.load_templates()
         
     def load_templates(self):
-        """Загружает шаблоны из JSON файла"""
+        """Загружает шаблоны из JSON файла в папке программы"""
         try:
             if os.path.exists(self.template_file):
                 with open(self.template_file, 'r', encoding='utf-8') as f:
@@ -237,6 +236,8 @@ class TemplateEditorDialog(QDialog):
 class ExcelParserApp(QMainWindow):
     def __init__(self):
         super().__init__()
+        # Загружаем настройки
+        self.settings = QSettings("ExcelParser", "TemplateSystem")
         self.template_manager = TemplateManager()
         self.unprocessed_templates = []  # Шаблоны без output_column
         self.initUI()
@@ -254,6 +255,11 @@ class ExcelParserApp(QMainWindow):
         dir_layout = QHBoxLayout()
         self.dir_label = QLabel('Selected directory:')
         self.dir_path = QLineEdit()
+        
+        # Загружаем сохраненный путь к директории
+        saved_dir = self.settings.value("last_directory", "")
+        self.dir_path.setText(saved_dir)
+        
         self.browse_btn = QPushButton('Browse')
         self.browse_btn.clicked.connect(self.browse_directory)
         dir_layout.addWidget(self.dir_label)
@@ -263,22 +269,17 @@ class ExcelParserApp(QMainWindow):
         # Output file selection
         output_layout = QHBoxLayout()
         self.output_label = QLabel('Output file:')
-        self.output_path = QLineEdit('output.xlsx')
+        self.output_path = QLineEdit()
+        
+        # Загружаем сохраненный путь к выходному файлу
+        saved_output = self.settings.value("last_output_file", "output.xlsx")
+        self.output_path.setText(saved_output)
+        
         self.output_browse_btn = QPushButton('Browse Output')
         self.output_browse_btn.clicked.connect(self.browse_output_file)
         output_layout.addWidget(self.output_label)
         output_layout.addWidget(self.output_path)
         output_layout.addWidget(self.output_browse_btn)
-        
-        # Template file selection
-        template_layout = QHBoxLayout()
-        self.template_label = QLabel('Template file:')
-        self.template_path = QLineEdit('templates.json')
-        self.template_browse_btn = QPushButton('Browse Template')
-        self.template_browse_btn.clicked.connect(self.browse_template_file)
-        template_layout.addWidget(self.template_label)
-        template_layout.addWidget(self.template_path)
-        template_layout.addWidget(self.template_browse_btn)
         
         # Buttons for template management
         template_buttons_layout = QHBoxLayout()
@@ -291,7 +292,10 @@ class ExcelParserApp(QMainWindow):
         
         # Auto-create templates option
         self.auto_create_checkbox = QCheckBox("Auto-create new templates for unknown structures")
-        self.auto_create_checkbox.setChecked(True)
+        
+        # Загружаем сохраненное состояние чекбокса
+        auto_create_saved = self.settings.value("auto_create", True, type=bool)
+        self.auto_create_checkbox.setChecked(auto_create_saved)
         
         # Progress bar
         self.progress = QProgressBar()
@@ -304,42 +308,63 @@ class ExcelParserApp(QMainWindow):
         self.log = QTextEdit()
         self.log.setReadOnly(True)
         
+        # Кнопка для очистки лога
+        self.clear_log_btn = QPushButton('Clear Log')
+        self.clear_log_btn.clicked.connect(self.clear_log)
+        
         # Add all to main layout
         layout.addLayout(dir_layout)
         layout.addLayout(output_layout)
-        layout.addLayout(template_layout)
         layout.addLayout(template_buttons_layout)
         layout.addWidget(self.auto_create_checkbox)
         layout.addWidget(self.progress)
         layout.addWidget(self.process_btn)
+        layout.addWidget(self.clear_log_btn)
         layout.addWidget(self.log)
         
         central_widget.setLayout(layout)
+        
+    def save_settings(self):
+        """Сохраняет текущие настройки"""
+        self.settings.setValue("last_directory", self.dir_path.text())
+        self.settings.setValue("last_output_file", self.output_path.text())
+        self.settings.setValue("auto_create", self.auto_create_checkbox.isChecked())
+        self.settings.sync()  # Принудительно сохраняем настройки
+        
+    def closeEvent(self, event):
+        """Сохраняем настройки при закрытии программы"""
+        self.save_settings()
+        event.accept()
         
     def browse_directory(self):
         directory = QFileDialog.getExistingDirectory(self, 'Select Directory')
         if directory:
             self.dir_path.setText(directory)
+            # Сохраняем путь сразу после выбора
+            self.settings.setValue("last_directory", directory)
             
     def browse_output_file(self):
-        file_name, _ = QFileDialog.getSaveFileName(self, 'Save Output File', 'output.xlsx', 'Excel Files (*.xlsx)')
+        # Предлагаем сохранить в той же папке, что и последний раз
+        last_output = self.settings.value("last_output_file", "output.xlsx")
+        default_dir = os.path.dirname(last_output) if os.path.dirname(last_output) else ""
+        
+        file_name, _ = QFileDialog.getSaveFileName(
+            self, 
+            'Save Output File', 
+            last_output, 
+            'Excel Files (*.xlsx)'
+        )
         if file_name:
             self.output_path.setText(file_name)
-            
-    def browse_template_file(self):
-        file_name, _ = QFileDialog.getOpenFileName(self, 'Open Template File', '', 'JSON Files (*.json)')
-        if file_name:
-            self.template_path.setText(file_name)
-            self.reload_templates()
+            # Сохраняем путь сразу после выбора
+            self.settings.setValue("last_output_file", file_name)
             
     def reload_templates(self):
-        """Перезагружает шаблоны из файла"""
-        template_file = self.template_path.text()
-        self.template_manager.template_file = template_file
+        """Перезагружает шаблоны из файла templates.json"""
         if self.template_manager.load_templates():
-            self.log_message(f"Loaded {len(self.template_manager.templates)} templates from {template_file}")
+            self.log_message(f"Loaded {len(self.template_manager.templates)} templates from templates.json")
         else:
-            self.log_message(f"Failed to load templates from {template_file}")
+            self.log_message("Failed to load templates from templates.json")
             
     def edit_templates(self):
         """Открывает диалог для редактирования шаблонов"""
@@ -350,7 +375,7 @@ class ExcelParserApp(QMainWindow):
         # Создаем простой диалог для выбора шаблона
         dialog = QDialog(self)
         dialog.setWindowTitle("Select Template to Edit")
-        dialog.setGeometry(300, 300, 400, 300)
+        dialog.setGeometry(300, 300, 500, 350)
         
         layout = QVBoxLayout()
         
@@ -359,10 +384,15 @@ class ExcelParserApp(QMainWindow):
         template_combo = QComboBox()
         for template in self.template_manager.templates:
             uvkn_text = " (УВНК)" if template.get('has_uvnk', False) else ""
-            template_combo.addItem(f"{template['name']}{uvkn_text}", template['id'])
+            sheet_info = f" [Лист: {template['sheet']}]" if template.get('sheet') else ""
+            template_combo.addItem(f"{template['name']}{uvkn_text}{sheet_info}", template['id'])
         form_layout.addRow("Template:", template_combo)
         
         layout.addLayout(form_layout)
+        
+        # Информация о количестве шаблонов
+        info_label = QLabel(f"Всего шаблонов: {len(self.template_manager.templates)}")
+        layout.addWidget(info_label)
         
         # Кнопки
         button_layout = QHBoxLayout()
@@ -389,6 +419,10 @@ class ExcelParserApp(QMainWindow):
         
         dialog.setLayout(layout)
         dialog.exec_()
+        
+    def clear_log(self):
+        """Очищает окно лога"""
+        self.log.clear()
         
     def log_message(self, message):
         self.log.append(message)
@@ -731,6 +765,9 @@ class ExcelParserApp(QMainWindow):
             if not directory:
                 self.log_message("Please select a directory first.")
                 return
+            
+            # Сохраняем текущие настройки перед обработкой
+            self.save_settings()
             
             # Перезагружаем шаблоны
             self.reload_templates()
