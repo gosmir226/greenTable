@@ -2,8 +2,8 @@
   "templates": [
     {
       "id": "template_1765459228_0",
-      "name": "Автошаблон для 498(УВНК-9А№2)",
-      "sheet": "498(УВНК-9А№2)",
+      "name": "Стандартный шаблон УВНК0",
+      "sheet": "УВНК",
       "has_uvnk": true,
       "description": "Auto-created from sheet 498(УВНК-9А№2), chain 1, block starting col 1",
       "fingerprint": "3x1_0_0_true|3x1_0_1_true|1x3_0_2_true|1x3_0_5_true|1x3_1_2_true|2x3_1_5_true|1x3_2_2_true",
@@ -103,8 +103,8 @@
     },
     {
       "id": "template_1765459228_1",
-      "name": "Автошаблон для 498(УВНК-9А№2)",
-      "sheet": "498(УВНК-9А№2)",
+      "name": "Пустой шаблон УВНК",
+      "sheet": "УВНК",
       "has_uvnk": true,
       "description": "Auto-created from sheet 498(УВНК-9А№2), chain 1, block starting col 1",
       "fingerprint": "3x1_0_0_false|3x1_0_1_false|1x3_0_2_false|1x3_0_5_false|1x3_1_2_false|2x3_1_5_false|1x3_2_2_false",
@@ -199,6 +199,1893 @@
             "col": 3
           },
           "output_column": ""
+        }
+      ]
+    },
+    {
+      "id": "template_1765460780_2",
+      "name": "Пустой шаблон 522",
+      "sheet": "522",
+      "has_uvnk": false,
+      "description": "Auto-created from sheet 522, chain 1, block starting col 2",
+      "fingerprint": "3x1_0_0_false|3x1_0_1_false|1x3_0_2_false|1x3_0_5_false|1x3_1_2_false|2x3_1_5_false|1x3_2_2_false",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 2
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 3
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 4
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 7
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 5,
+            "col": 4
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 5,
+            "col": 7
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 6,
+            "col": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460780_3",
+      "name": "Автошаблон для 522",
+      "sheet": "522",
+      "has_uvnk": false,
+      "description": "Auto-created from sheet 522, chain 1, block starting col 50",
+      "fingerprint": "3x1_0_0_true|3x1_0_1_true|1x3_0_2_true|1x3_0_5_true|1x3_1_2_true|2x3_1_5_true|1x3_2_2_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Керамика",
+          "example": 36,
+          "absolute_position": {
+            "row": 4,
+            "col": 50
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Железо",
+          "example": 36,
+          "absolute_position": {
+            "row": 4,
+            "col": 51
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Шихта",
+          "example": "24-И-4030",
+          "absolute_position": {
+            "row": 4,
+            "col": 52
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Номенклатура",
+          "example": "522(0)",
+          "absolute_position": {
+            "row": 4,
+            "col": 55
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Плавка",
+          "example": "25Г01",
+          "absolute_position": {
+            "row": 5,
+            "col": 52
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Комментарий",
+          "example": "КОММ.",
+          "absolute_position": {
+            "row": 5,
+            "col": 55
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Блок 1",
+          "example": 204,
+          "absolute_position": {
+            "row": 6,
+            "col": 52
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460780_4",
+      "name": "Образцы 522",
+      "sheet": "522",
+      "has_uvnk": false,
+      "description": "Auto-created from sheet 522, chain 1, block starting col 50",
+      "fingerprint": "3x5_0_0_true|3x3_0_5_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 5,
+          "required": true,
+          "output_column": "Плавка",
+          "example": "25Г01\n24-И-4030",
+          "absolute_position": {
+            "row": 34,
+            "col": 50
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 3,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Образцы",
+          "example": "8шт обр.",
+          "absolute_position": {
+            "row": 34,
+            "col": 55
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460780_5",
+      "name": "То куда пишут УППФ",
+      "sheet": "522",
+      "has_uvnk": false,
+      "description": "Auto-created from sheet 522, chain 1, block starting col 50",
+      "fingerprint": "3x1_0_0_false|3x1_0_1_false|1x3_0_2_false|1x3_0_5_false|2x3_1_2_true|2x3_1_5_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 58,
+            "col": 50
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 58,
+            "col": 51
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 58,
+            "col": 52
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 58,
+            "col": 55
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Печь",
+          "example": "УППФ-У",
+          "absolute_position": {
+            "row": 59,
+            "col": 52
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Исполнитель",
+          "example": "К",
+          "absolute_position": {
+            "row": 59,
+            "col": 55
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460782_6",
+      "name": "Шаблон ТУ001 522",
+      "sheet": "522",
+      "has_uvnk": false,
+      "description": "Auto-created from sheet 522, chain 4, block starting col 58",
+      "fingerprint": "3x1_0_0_true|3x1_0_1_true|1x3_0_2_false|1x3_0_5_false|1x3_1_2_true|2x3_1_5_true|1x3_2_2_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Керамика",
+          "example": 16,
+          "absolute_position": {
+            "row": 229,
+            "col": 58
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Железо",
+          "example": 16,
+          "absolute_position": {
+            "row": 229,
+            "col": 59
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 229,
+            "col": 60
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 229,
+            "col": 63
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Количество ТУ",
+          "example": "100 (возвр)",
+          "absolute_position": {
+            "row": 230,
+            "col": 60
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Плавка",
+          "example": "ТУ001/01",
+          "absolute_position": {
+            "row": 230,
+            "col": 63
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Блок 1",
+          "example": "165\\1",
+          "absolute_position": {
+            "row": 231,
+            "col": 60
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460825_7",
+      "name": "Пустой шаблон 9002",
+      "sheet": "9002",
+      "has_uvnk": false,
+      "description": "Auto-created from sheet 9002, chain 1, block starting col 2",
+      "fingerprint": "3x1_0_0_false|3x1_0_1_false|1x3_0_2_false|1x3_0_5_false|1x3_1_2_false|2x3_1_5_false|1x3_2_2_false",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 2
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 3
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 4
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 7
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 5,
+            "col": 4
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 5,
+            "col": 7
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 6,
+            "col": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460825_8",
+      "name": "Стандартный шаблон 9002",
+      "sheet": "9002",
+      "has_uvnk": false,
+      "description": "Auto-created from sheet 9002, chain 1, block starting col 34",
+      "fingerprint": "3x1_0_0_true|3x1_0_1_true|1x3_0_2_true|1x3_0_5_true|1x3_1_2_true|2x3_1_5_true|1x3_2_2_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Керамика",
+          "example": 32,
+          "absolute_position": {
+            "row": 4,
+            "col": 34
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Железо",
+          "example": 32,
+          "absolute_position": {
+            "row": 4,
+            "col": 35
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Шихта",
+          "example": "24-И-4030",
+          "absolute_position": {
+            "row": 4,
+            "col": 36
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Цифра",
+          "example": 1,
+          "absolute_position": {
+            "row": 4,
+            "col": 39
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Плавка",
+          "example": "25Р01",
+          "absolute_position": {
+            "row": 5,
+            "col": 36
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Комментарий",
+          "example": "СП042-40",
+          "absolute_position": {
+            "row": 5,
+            "col": 39
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Блок 1",
+          "example": 2371,
+          "absolute_position": {
+            "row": 6,
+            "col": 36
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460825_9",
+      "name": "Образцы 9002",
+      "sheet": "9002",
+      "has_uvnk": false,
+      "description": "Auto-created from sheet 9002, chain 1, block starting col 34",
+      "fingerprint": "3x5_0_0_true|3x3_0_5_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 5,
+          "required": true,
+          "output_column": "Плавка",
+          "example": "25Р01                      24-И-4030\n",
+          "absolute_position": {
+            "row": 49,
+            "col": 34
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 3,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Образцы",
+          "example": "8шт обр.",
+          "absolute_position": {
+            "row": 49,
+            "col": 39
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460825_10",
+      "name": "То куда пишут УППФ 9002",
+      "sheet": "9002",
+      "has_uvnk": false,
+      "description": "Auto-created from sheet 9002, chain 1, block starting col 34",
+      "fingerprint": "3x1_0_0_false|3x1_0_1_false|1x3_0_2_false|1x3_0_5_false|2x3_1_2_true|2x3_1_5_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 58,
+            "col": 34
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 58,
+            "col": 35
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 58,
+            "col": 36
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 58,
+            "col": 39
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Печь",
+          "example": "УППФ-У",
+          "absolute_position": {
+            "row": 59,
+            "col": 36
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Исполнитель",
+          "example": "К",
+          "absolute_position": {
+            "row": 59,
+            "col": 39
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460832_11",
+      "name": "Пустой шаблон УВНК",
+      "sheet": "УВНК",
+      "has_uvnk": true,
+      "description": "Auto-created from sheet 498(УВНК-9А №1), chain 1, block starting col 1",
+      "fingerprint": "3x1_0_0_false|3x1_0_1_false|1x3_0_2_false|1x3_0_5_false|1x3_1_2_false|2x3_1_5_false|1x3_2_2_false",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 1
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 2
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 3
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 6
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 5,
+            "col": 3
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 5,
+            "col": 6
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 6,
+            "col": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460832_12",
+      "name": "Стандартный шаблон УВНК",
+      "sheet": "УВНК",
+      "has_uvnk": true,
+      "description": "Auto-created from sheet 498(УВНК-9А №1), chain 1, block starting col 41",
+      "fingerprint": "3x1_0_0_true|3x1_0_1_true|1x3_0_2_true|1x3_0_5_true|1x3_1_2_true|2x3_1_5_true|1x3_2_2_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Керамика",
+          "example": 30,
+          "absolute_position": {
+            "row": 4,
+            "col": 41
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Железо",
+          "example": 30,
+          "absolute_position": {
+            "row": 4,
+            "col": 42
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Шихта",
+          "example": "24Н-266Н",
+          "absolute_position": {
+            "row": 4,
+            "col": 43
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Блок 1",
+          "example": 2407,
+          "absolute_position": {
+            "row": 4,
+            "col": 46
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Плавка",
+          "example": "25Н02(1)",
+          "absolute_position": {
+            "row": 5,
+            "col": 43
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Комментарий",
+          "example": "9 шт.обр.",
+          "absolute_position": {
+            "row": 5,
+            "col": 46
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Блок 2",
+          "example": "2456",
+          "absolute_position": {
+            "row": 6,
+            "col": 43
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460832_13",
+      "name": "ТУ 37/12 УВНК",
+      "sheet": "УВНК",
+      "has_uvnk": true,
+      "description": "Auto-created from sheet 498(УВНК-9А №1), chain 4, block starting col 17",
+      "fingerprint": "3x1_0_0_true|3x1_0_1_true|1x3_0_2_true|1x3_0_5_true|1x3_1_2_false|2x3_1_5_true|1x3_2_2_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Керамика",
+          "example": 48,
+          "absolute_position": {
+            "row": 70,
+            "col": 17
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Железо",
+          "example": 48,
+          "absolute_position": {
+            "row": 70,
+            "col": 18
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Шихта",
+          "example": "24Н-267Н",
+          "absolute_position": {
+            "row": 70,
+            "col": 19
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Блок 1",
+          "example": 1,
+          "absolute_position": {
+            "row": 70,
+            "col": 22
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 71,
+            "col": 19
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Плавка",
+          "example": "ТУ 37/12",
+          "absolute_position": {
+            "row": 71,
+            "col": 22
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Блок 2",
+          "example": "2",
+          "absolute_position": {
+            "row": 72,
+            "col": 19
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460832_14",
+      "name": "ТУ 27/10 УВНК",
+      "sheet": "УВНК)",
+      "has_uvnk": true,
+      "description": "Auto-created from sheet 498(УВНК-9А №1), chain 5, block starting col 33",
+      "fingerprint": "3x1_0_0_true|3x1_0_1_true|1x3_0_2_true|1x3_0_5_false|1x3_1_2_false|2x3_1_5_true|1x3_2_2_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Керамика",
+          "example": 12,
+          "absolute_position": {
+            "row": 92,
+            "col": 33
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Железо",
+          "example": 12,
+          "absolute_position": {
+            "row": 92,
+            "col": 34
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Металл",
+          "example": "ВЖМ 4-ВИ",
+          "absolute_position": {
+            "row": 92,
+            "col": 35
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 92,
+            "col": 38
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 93,
+            "col": 35
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Плавка",
+          "example": "ТУ 27/10",
+          "absolute_position": {
+            "row": 93,
+            "col": 38
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Шихта",
+          "example": "24ЖР-200И",
+          "absolute_position": {
+            "row": 94,
+            "col": 35
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460835_17",
+      "name": "Нужно сделать шаблон для УВНК 25АВ",
+      "sheet": "УВНК",
+      "has_uvnk": true,
+      "description": "Auto-created from sheet 498(УВНК-9А №2), chain 3, block starting col 49",
+      "fingerprint": "3x1_0_0_true|3x1_0_1_true|1x3_0_2_true|1x3_0_5_true|1x3_1_2_true|2x3_1_5_true|1x3_2_2_false",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Керамика",
+          "example": 2,
+          "absolute_position": {
+            "row": 57,
+            "col": 49
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Железо",
+          "example": 2,
+          "absolute_position": {
+            "row": 57,
+            "col": 50
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Шихта",
+          "example": 200010265,
+          "absolute_position": {
+            "row": 57,
+            "col": 51
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Блок 1",
+          "example": "217 (4,5)",
+          "absolute_position": {
+            "row": 57,
+            "col": 54
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Плавка",
+          "example": "ИЯТЛ.744356.103",
+          "absolute_position": {
+            "row": 58,
+            "col": 51
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Комментарий",
+          "example": "25АВ01",
+          "absolute_position": {
+            "row": 58,
+            "col": 54
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "Блок 2",
+          "example": null,
+          "absolute_position": {
+            "row": 59,
+            "col": 51
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460838_18",
+      "name": "Пустой шаблон Разное",
+      "sheet": "Разное",
+      "has_uvnk": false,
+      "description": "Auto-created from sheet Разное, chain 1, block starting col 2",
+      "fingerprint": "3x1_0_0_false|3x1_0_1_false|1x3_0_2_false|1x3_0_5_false|1x3_1_2_false|2x3_1_5_false|1x3_2_2_false",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 2
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 3
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 4
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 4,
+            "col": 7
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 5,
+            "col": 4
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 5,
+            "col": 7
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 6,
+            "col": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460838_19",
+      "name": "Стандартный шаблон Разное",
+      "sheet": "Разное",
+      "has_uvnk": false,
+      "description": "Auto-created from sheet Разное, chain 2, block starting col 34",
+      "fingerprint": "3x1_0_0_true|3x1_0_1_true|1x3_0_2_true|1x3_0_5_true|1x3_1_2_true|2x3_1_5_true|1x3_2_2_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Керамика",
+          "example": 5,
+          "absolute_position": {
+            "row": 68,
+            "col": 34
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Железо",
+          "example": 5,
+          "absolute_position": {
+            "row": 68,
+            "col": 35
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Шихта",
+          "example": "Mar B24-90",
+          "absolute_position": {
+            "row": 68,
+            "col": 36
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Цифра",
+          "example": 0,
+          "absolute_position": {
+            "row": 68,
+            "col": 39
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Плавка",
+          "example": "25П01",
+          "absolute_position": {
+            "row": 69,
+            "col": 36
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Комментарий",
+          "example": "КОММ.",
+          "absolute_position": {
+            "row": 69,
+            "col": 39
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Блок 1",
+          "example": 141,
+          "absolute_position": {
+            "row": 70,
+            "col": 36
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460838_20",
+      "name": "Образцы Разное",
+      "sheet": "Разное",
+      "has_uvnk": false,
+      "description": "Auto-created from sheet Разное, chain 2, block starting col 34",
+      "fingerprint": "3x5_0_0_true|3x3_0_5_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 5,
+          "required": true,
+          "output_column": "Плавка",
+          "example": "25П01                                                          В24-90\n",
+          "absolute_position": {
+            "row": 107,
+            "col": 34
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 3,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Образцы",
+          "example": "8шт обр.",
+          "absolute_position": {
+            "row": 107,
+            "col": 39
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460838_21",
+      "name": "То куда пишут УППФ Разное",
+      "sheet": "Разное",
+      "has_uvnk": false,
+      "description": "Auto-created from sheet Разное, chain 2, block starting col 34",
+      "fingerprint": "3x1_0_0_false|3x1_0_1_false|1x3_0_2_false|1x3_0_5_false|2x3_1_2_true|2x3_1_5_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 122,
+            "col": 34
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 122,
+            "col": 35
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 122,
+            "col": 36
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 122,
+            "col": 39
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Печь",
+          "example": "УППФ-У",
+          "absolute_position": {
+            "row": 123,
+            "col": 36
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Исполнитель",
+          "example": "С",
+          "absolute_position": {
+            "row": 123,
+            "col": 39
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460839_22",
+      "name": "Шаблон ТУ 008/04 Разное",
+      "sheet": "Разное",
+      "has_uvnk": false,
+      "description": "Auto-created from sheet Разное, chain 4, block starting col 10",
+      "fingerprint": "3x1_0_0_true|3x1_0_1_true|1x3_0_2_true|1x3_0_5_false|1x3_1_2_false|2x3_1_5_true|1x3_2_2_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Керамика",
+          "example": 10,
+          "absolute_position": {
+            "row": 196,
+            "col": 10
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Железо",
+          "example": 10,
+          "absolute_position": {
+            "row": 196,
+            "col": 11
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Затравки",
+          "example": "затравки",
+          "absolute_position": {
+            "row": 196,
+            "col": 12
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 196,
+            "col": 15
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 197,
+            "col": 12
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Плавка",
+          "example": "ТУ008/04",
+          "absolute_position": {
+            "row": 197,
+            "col": 15
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Блок 1",
+          "example": 1,
+          "absolute_position": {
+            "row": 198,
+            "col": 12
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765460839_23",
+      "name": "ТУ 008/04 Разное",
+      "sheet": "Разное",
+      "has_uvnk": false,
+      "description": "Auto-created from sheet Разное, chain 4, block starting col 10",
+      "fingerprint": "3x1_0_0_true|3x1_0_1_true|1x3_0_2_true|1x3_0_5_false|1x3_1_2_true|2x3_1_5_true|1x3_2_2_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Керамика",
+          "example": 10,
+          "absolute_position": {
+            "row": 211,
+            "col": 10
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "Железо",
+          "example": 10,
+          "absolute_position": {
+            "row": 211,
+            "col": 11
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Затравки",
+          "example": "затравки",
+          "absolute_position": {
+            "row": 211,
+            "col": 12
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 211,
+            "col": 15
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "",
+          "example": "50/50 (возвр)",
+          "absolute_position": {
+            "row": 212,
+            "col": 12
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Плавка",
+          "example": "ТУ008/04",
+          "absolute_position": {
+            "row": 212,
+            "col": 15
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "Блок 1",
+          "example": 6,
+          "absolute_position": {
+            "row": 213,
+            "col": 12
+          }
+        }
+      ]
+    },
+    {
+      "id": "template_1765463699_22",
+      "name": "Автошаблон для 498(УВНК-9А №1)",
+      "sheet": "498(УВНК-9А №1)",
+      "has_uvnk": true,
+      "description": "Auto-created from sheet 498(УВНК-9А №1), chain 5, block starting col 33",
+      "fingerprint": "3x1_0_0_true|3x1_0_1_true|1x3_0_2_true|1x3_0_5_false|1x3_1_2_false|2x3_1_5_true|1x3_2_2_true",
+      "cells": [
+        {
+          "row": 0,
+          "col": 0,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "",
+          "example": 12,
+          "absolute_position": {
+            "row": 92,
+            "col": 33
+          }
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "rowspan": 3,
+          "colspan": 1,
+          "required": true,
+          "output_column": "",
+          "example": 12,
+          "absolute_position": {
+            "row": 92,
+            "col": 34
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "",
+          "example": "ВЖМ 4-ВИ",
+          "absolute_position": {
+            "row": 92,
+            "col": 35
+          }
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 92,
+            "col": 38
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": false,
+          "output_column": "",
+          "example": null,
+          "absolute_position": {
+            "row": 93,
+            "col": 35
+          }
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "rowspan": 2,
+          "colspan": 3,
+          "required": true,
+          "output_column": "",
+          "example": "ТУ 27/10",
+          "absolute_position": {
+            "row": 93,
+            "col": 38
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "rowspan": 1,
+          "colspan": 3,
+          "required": true,
+          "output_column": "",
+          "example": "24ЖР-200И",
+          "absolute_position": {
+            "row": 94,
+            "col": 35
+          }
         }
       ]
     }
