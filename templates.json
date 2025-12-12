@@ -1990,8 +1990,8 @@
     },
     {
       "id": "template_1765463699_22",
-      "name": "Автошаблон для 498(УВНК-9А №1)",
-      "sheet": "498(УВНК-9А №1)",
+      "name": "ТУ 27/10 УВНК",
+      "sheet": "УВНК",
       "has_uvnk": true,
       "description": "Auto-created from sheet 498(УВНК-9А №1), chain 5, block starting col 33",
       "fingerprint": "3x1_0_0_true|3x1_0_1_true|1x3_0_2_true|1x3_0_5_false|1x3_1_2_false|2x3_1_5_true|1x3_2_2_true",
@@ -2002,7 +2002,7 @@
           "rowspan": 3,
           "colspan": 1,
           "required": true,
-          "output_column": "",
+          "output_column": "Керамика",
           "example": 12,
           "absolute_position": {
             "row": 92,
@@ -2015,7 +2015,7 @@
           "rowspan": 3,
           "colspan": 1,
           "required": true,
-          "output_column": "",
+          "output_column": "Железо",
           "example": 12,
           "absolute_position": {
             "row": 92,
@@ -2028,7 +2028,7 @@
           "rowspan": 1,
           "colspan": 3,
           "required": true,
-          "output_column": "",
+          "output_column": "Металл",
           "example": "ВЖМ 4-ВИ",
           "absolute_position": {
             "row": 92,
@@ -2067,7 +2067,7 @@
           "rowspan": 2,
           "colspan": 3,
           "required": true,
-          "output_column": "",
+          "output_column": "Плавка",
           "example": "ТУ 27/10",
           "absolute_position": {
             "row": 93,
@@ -2080,7 +2080,7 @@
           "rowspan": 1,
           "colspan": 3,
           "required": true,
-          "output_column": "",
+          "output_column": "Шихта",
           "example": "24ЖР-200И",
           "absolute_position": {
             "row": 94,
